@@ -2,6 +2,7 @@ using Blazor_WebAssembly_App;
 using Blazor_WebAssembly_App.ApiServices;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Blazored.LocalStorage;
 
 internal class Program
 {
@@ -27,6 +28,7 @@ internal class Program
         });
 
         builder.Services.AddScoped<BlazorBackendApiServices>();
+        builder.Services.AddBlazoredLocalStorage(); // <= this should do for local search history storage
 
         await builder.Build().RunAsync();
     }

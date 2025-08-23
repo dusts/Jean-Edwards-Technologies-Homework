@@ -81,5 +81,8 @@ namespace SharedModels
 
         [JsonPropertyName("Error")]
         public string Error { get; set; } = string.Empty; // Included for error responses :? do we need this?
+
+        [JsonPropertyName("QueryWithoutApiKey")]
+        public string QueryWithoutApiKey { get; set; } = string.Empty; // Included for query saving
     }
 }
