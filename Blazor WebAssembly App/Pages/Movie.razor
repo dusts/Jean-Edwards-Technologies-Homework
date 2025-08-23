@@ -1,0 +1,67 @@
+﻿@page "/movie"
+@using SharedModels
+@inject BlazorBackendApiServices backendApiServices
+
+<h3>Movie Details</h3>
+
+@if (movie == null && errorMessage == null)
+{
+    <p>Loading...</p>
+}
+else if (errorMessage != null)
+{
+    <p>Error: @errorMessage</p>
+}
+else
+{
+    <div>
+        <h4>@movie.Title (@movie.Year)</h4>
+        <p>Rated: @movie.Rated</p>
+        <p>Released: @movie.Released</p>
+        <p>Runtime: @movie.Runtime</p>
+        <p>Genre: @movie.Genre</p>
+        <p>Director: @movie.Director</p>
+        <p>Writer: @movie.Writer</p>
+        <p>Actors: @movie.Actors</p>
+        <p>Plot: @movie.Plot</p>
+        <p>Language: @movie.Language</p>
+        <p>Country: @movie.Country</p>
+        <p>Awards: @movie.Awards</p>
+        <img src="@movie.Poster" alt="Poster" style="max-width: 300px;" />
+        <h5>Ratings:</h5>
+        <ul>
+            @foreach (var rating in movie.Ratings)
+            {
+                <li>@rating.Source: @rating.Value</li>
+            }
+        </ul>
+        <p>Metascore: @movie.Metascore</p>
+        <p>IMDb Rating: @movie.ImdbRating</p>
+        <p>IMDb Votes: @movie.ImdbVotes</p>
+        <p>IMDb ID: @movie.ImdbID</p>
+        <p>Type: @movie.Type</p>
+        <p>DVD: @movie.DVD</p>
+        <p>Box Office: @movie.BoxOffice</p>
+        <p>Production: @movie.Production</p>
+        <p>Website: @movie.Website</p>
+    </div>
+}
+
+@code {
+    private SharedModels.Movie movie;
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            movie = await backendApiServices.GetMovieByIdAsync("tt3896198");
+            Console.WriteLine($"Movie loaded: {movie?.Title}");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Failed to load movie: {ex.Message}";
+            Console.WriteLine(errorMessage);
+        }
+    }
+}
