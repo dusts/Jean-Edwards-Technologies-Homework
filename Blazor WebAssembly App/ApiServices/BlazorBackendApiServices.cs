@@ -72,7 +72,7 @@ namespace Blazor_WebAssembly_App.ApiServices
                 lastQueries.Add(movieQuery);
                 if(lastQueries.Count > 5)
                 {
-                    lastQueries.RemoveAt(0); // removes first entry (to maintain 5 movie search list thing
+                    lastQueries.RemoveAt(0); // removes first entry (to maintain 5 movie search list thing)
                 }
                 await _localStorage.SetItemAsync("LastQueries", lastQueries);
             }
