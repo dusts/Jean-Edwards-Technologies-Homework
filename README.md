@@ -19,7 +19,7 @@ The Blazor WebAssembly App (Movie Search App for homework) is a Blazor WebAssemb
 - **Blazor App - Homework.Blazor Backend API tests**: Backend unit tests for `MoviesController`.
 
 ## Setup
-1. **Clone the Repository**: <https://dicismartins.visualstudio.com/Jean%20Edwards%20Technologies%20Homework/_git/Blazor%20App%20-%20Homework>
+1. **Clone the Repository**
 2. **Don't forget to add api key**: "OmdbApiKey": "your_api_key" to user secrets in **Blazor App - Homework.Blazor Backend API**
 3. enjoy
 
