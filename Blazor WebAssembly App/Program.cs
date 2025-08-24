@@ -3,6 +3,7 @@ using Blazor_WebAssembly_App.ApiServices;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Blazored.LocalStorage;
+using SharedModels.Services;
 
 internal class Program
 {
@@ -27,8 +28,8 @@ internal class Program
             client.BaseAddress = new Uri(blazorBackendApiUrl);
         });
 
-        builder.Services.AddScoped<BlazorBackendApiServices>();
         builder.Services.AddBlazoredLocalStorage(); // <= this should do for local search history storage
+        builder.Services.AddScoped<IMovieService, MovieService>(); // Registering IBlazorBackendApiServices
 
         await builder.Build().RunAsync();
     }

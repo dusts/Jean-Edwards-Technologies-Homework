@@ -1,0 +1,104 @@
+﻿@page "/movie/{id}"
+@inject IMovieService movieService
+@inject NavigationManager NavigationManager
+
+<div class="movie-details-container">
+    @if (movie != null)
+    {
+        <div class="movie-header">
+            <img src="@movie.Poster" alt="@movie.Title" class="movie-poster" />
+            <div class="movie-info">
+                <h2>@movie.Title (@movie.Year)</h2>
+                <p><strong>Type:</strong> @movie.Type</p>
+                <p><strong>Rated:</strong> @movie.Rated</p>
+                <p><strong>Runtime:</strong> @movie.Runtime</p>
+                <p><strong>Genre:</strong> @movie.Genre</p>
+                <p><strong>Released:</strong> @movie.Released</p>
+                <p><strong>IMDb Rating:</strong> @movie.ImdbRating (@movie.ImdbVotes votes)</p>
+                <p><strong>Metascore:</strong> @movie.Metascore</p>
+            </div>
+        </div>
+
+        <div class="movie-details">
+            <h3>Plot</h3>
+            <p>@movie.Plot</p>
+
+            <h3>Cast & Crew</h3>
+            <p><strong>Director:</strong> @movie.Director</p>
+            <p><strong>Writer:</strong> @movie.Writer</p>
+            <p><strong>Actors:</strong> @movie.Actors</p>
+
+            <h3>Production Details</h3>
+            <p><strong>Country:</strong> @movie.Country</p>
+            <p><strong>Language:</strong> @movie.Language</p>
+            <p><strong>Production:</strong> @movie.Production</p>
+            <p><strong>Box Office:</strong> @movie.BoxOffice</p>
+            <p><strong>Awards:</strong> @movie.Awards</p>
+            <p><strong>DVD Release:</strong> @movie.DVD</p>
+            @if (!string.IsNullOrEmpty(movie.Website))
+            {
+                <p><strong>Website:</strong> <a href="@movie.Website" target="_blank">@movie.Website</a></p>
+            }
+
+            <h3>Ratings</h3>
+            @if (movie.Ratings.Any())
+            {
+                <ul>
+                    @foreach (var rating in movie.Ratings)
+                    {
+                        <li><strong>@rating.Source:</strong> @rating.Value</li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No ratings available.</p>
+            }
+        </div>
+
+        <button class="btn btn-secondary" @onclick="GoBack">Back to Search</button>
+    }
+    else if (isLoading)
+    {
+        <p>Loading...</p>
+    }
+    else if (errorMessage != null)
+    {
+        <p class="error">@errorMessage</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private Movie movie;
+    private bool isLoading = false;
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+            movie = await movieService.GetMovieDetailsAsync(Id);
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            errorMessage = "Movie not found.";
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error fetching movie details: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/search");
+    }
+}

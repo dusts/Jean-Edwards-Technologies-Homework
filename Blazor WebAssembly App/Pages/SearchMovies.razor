@@ -1,0 +1,196 @@
+﻿@page "/search"
+@inject IMovieService movieService
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
+<div class="search-bar">
+    <input type="text" @bind="searchQuery" @oninput="OnSearchInput" @onkeydown="HandleKeyDown"
+           placeholder="Search for movies..." autofocus />
+</div>
+
+<div class="recent-queries">
+    <h4>Recent Searches</h4>
+    @if (recentQueries.Any())
+    {
+        <ul role="listbox" @onkeydown="HandleKeyDown">
+            @for (int i = 0; i < recentQueries.Count; i++)
+            {
+                var query = recentQueries[i];
+                <li role="option" class="@(i == selectedQueryIndex ? "selected" : "") @(searchQuery == query.Query ? "active" : "")">
+                    <a href="#" @onclick="() => PerformSearch(query.Query)" @onclick:preventDefault>
+                        @query.Query <span class="timestamp">(@query.Timestamp.ToString("MMM dd, yyyy HH:mm"))</span>
+                    </a>
+                </li>
+            }
+        </ul>
+        <button class="btn btn-secondary" @onclick="ClearRecentQueries">Clear Recent Searches</button>
+    }
+    else
+    {
+        <p>No recent searches.</p>
+    }
+</div>
+
+@if (movies != null && movies.Search != null)
+{
+    <div class="movie-grid">
+        @foreach (var movie in movies.Search)
+        {
+            <div class="movie-card">
+                <img src="@movie.Poster" alt="@movie.Title" loading="lazy" />
+                <h4>@movie.Title (@movie.Year)</h4>
+                <a href="/movie/@movie.ImdbID">Details</a>
+            </div>
+        }
+    </div>
+}
+else if (isLoading)
+{
+    <p>Loading...</p>
+}
+else if (errorMessage != null)
+{
+    <p>@errorMessage</p>
+}
+
+@code {
+    public string searchQuery = "";
+    public MovieSearchResult movies;
+    public bool isLoading = false;
+    public string errorMessage;
+    public List<RecentQuery> recentQueries = new List<RecentQuery>();
+    public int debounceVersion = 0;
+    public int selectedQueryIndex = -1; // For keyboard navigation
+    public const string RecentQueriesKey = "RecentMovieQueries";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRecentQueries();
+    }
+
+    public async Task OnSearchInput(ChangeEventArgs e)
+    {
+        searchQuery = e.Value?.ToString()?.Trim() ?? "";
+        var currentVersion = ++debounceVersion;
+
+        await Task.Delay(300); // Debounce delay
+
+        if (currentVersion == debounceVersion)
+        {
+            await Search();
+        }
+    }
+
+    public async Task Search()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+            selectedQueryIndex = -1; // Reset keyboard selection
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                movies = await movieService.SearchMoviesAsync(searchQuery);
+                if (movies?.Response == "True")
+                {
+                    await SaveQuery(searchQuery);
+                }
+            }
+            else
+            {
+                movies = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error fetching movies: " + ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    public async Task PerformSearch(string query)
+    {
+        searchQuery = query;
+        selectedQueryIndex = recentQueries.FindIndex(q => q.Query == query);
+        await Search();
+    }
+
+    public async Task LoadRecentQueries()
+    {
+        try
+        {
+            recentQueries = await LocalStorage.GetItemAsync<List<RecentQuery>>(RecentQueriesKey) ?? new List<RecentQuery>();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading recent queries: {ex.Message}";
+        }
+    }
+
+    public async Task SaveQuery(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query) || query.Length < 2) // Minimum length for validation
+            return;
+
+        try
+        {
+            // Remove duplicates and maintain only the last 5 queries
+            recentQueries.RemoveAll(q => q.Query.Equals(query, StringComparison.OrdinalIgnoreCase));
+            recentQueries.Insert(0, new RecentQuery { Query = query, Timestamp = DateTime.Now });
+            if (recentQueries.Count > 5)
+            {
+                recentQueries = recentQueries.Take(5).ToList();
+            }
+
+            // Save to local storage
+            await LocalStorage.SetItemAsync(RecentQueriesKey, recentQueries);
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error saving query: {ex.Message}";
+        }
+        StateHasChanged();
+    }
+
+    public async Task ClearRecentQueries()
+    {
+        try
+        {
+            recentQueries.Clear();
+            selectedQueryIndex = -1;
+            await LocalStorage.RemoveItemAsync(RecentQueriesKey);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error clearing recent queries: {ex.Message}";
+        }
+    }
+
+    public async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (!recentQueries.Any())
+            return;
+
+        switch (e.Key)
+        {
+            case "ArrowDown":
+                selectedQueryIndex = Math.Min(selectedQueryIndex + 1, recentQueries.Count - 1);
+                StateHasChanged();
+                break;
+            case "ArrowUp":
+                selectedQueryIndex = Math.Max(selectedQueryIndex - 1, -1);
+                StateHasChanged();
+                break;
+            case "Enter":
+                if (selectedQueryIndex >= 0 && selectedQueryIndex < recentQueries.Count)
+                {
+                    await PerformSearch(recentQueries[selectedQueryIndex].Query);
+                }
+                break;
+        }
+    }
+}

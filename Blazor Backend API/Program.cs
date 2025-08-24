@@ -1,3 +1,6 @@
+using Blazor_Backend_API.Services;
+using SharedModels.Services;
+
 namespace Blazor_Backend_API
 {
     public class Program
@@ -13,6 +16,7 @@ namespace Blazor_Backend_API
             // Add services to the container.
             builder.Services.AddControllers();
             builder.Services.AddHttpClient();
+            builder.Services.AddScoped<IMovieService, OmdbMovieService>();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
