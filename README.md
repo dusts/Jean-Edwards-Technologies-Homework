@@ -13,7 +13,7 @@ The Blazor WebAssembly App (Movie Search App for homework) is a Blazor WebAssemb
 ## Project Structure
 - **Blazor App - Homework.Blazor WebAssembly App**: Blazor WebAssembly frontend with `SearchMovies` and `MovieDetails` components.
 - **Blazor App - Homework.Blazor Backend API**: ASP.NET Core Web API with `MoviesController` for OMDB API integration.
-- **Blazor App - Homework.SharedModels**: Shared models (`Movie`, `MovieSearchResult`, `RecentQuery`).
+- **Blazor App - Homework.SharedModels**: The `SharedModels` project contains data models (`Movie`, `MovieSearchResult`, `RecentQuery`, `Rating`)  and services (`IMovieService`) used by both frontend and backend.
 - **Blazor App - Homework.Blazor Frontend tests**: Frontend unit tests for `SearchMovies.razor`.
 - **Blazor App - Homework.Blazor Backend API tests**: Backend unit tests for `MoviesController`.
 
@@ -25,3 +25,4 @@ The Blazor WebAssembly App (Movie Search App for homework) is a Blazor WebAssemb
 ## P.S.
 I know that namings in this solution is all over the place, but it is what it is.
 And .md files were an aftertaught.
+**See Technical Documentation for more info**
