@@ -55,19 +55,19 @@ else if (errorMessage != null)
 @code {
     public string searchQuery = "";
     public MovieSearchResult movies;
-    public bool isLoading = false;
-    public string errorMessage;
-    public List<RecentQuery> recentQueries = new List<RecentQuery>();
-    public int debounceVersion = 0;
-    public int selectedQueryIndex = -1; // For keyboard navigation
-    public const string RecentQueriesKey = "RecentMovieQueries";
+    private bool isLoading = false;
+    private string errorMessage;
+    private List<RecentQuery> recentQueries = new List<RecentQuery>();
+    private int debounceVersion = 0;
+    private int selectedQueryIndex = -1; // For keyboard navigation
+    private const string RecentQueriesKey = "RecentMovieQueries";
 
     protected override async Task OnInitializedAsync()
     {
         await LoadRecentQueries();
     }
 
-    public async Task OnSearchInput(ChangeEventArgs e)
+    private async Task OnSearchInput(ChangeEventArgs e)
     {
         searchQuery = e.Value?.ToString()?.Trim() ?? "";
         var currentVersion = ++debounceVersion;
@@ -111,14 +111,14 @@ else if (errorMessage != null)
         }
     }
 
-    public async Task PerformSearch(string query)
+    private async Task PerformSearch(string query)
     {
         searchQuery = query;
         selectedQueryIndex = recentQueries.FindIndex(q => q.Query == query);
         await Search();
     }
 
-    public async Task LoadRecentQueries()
+    private async Task LoadRecentQueries()
     {
         try
         {
@@ -130,7 +130,7 @@ else if (errorMessage != null)
         }
     }
 
-    public async Task SaveQuery(string query)
+    private async Task SaveQuery(string query)
     {
         if (string.IsNullOrWhiteSpace(query) || query.Length < 2) // Minimum length for validation
             return;
@@ -155,7 +155,7 @@ else if (errorMessage != null)
         StateHasChanged();
     }
 
-    public async Task ClearRecentQueries()
+    private async Task ClearRecentQueries()
     {
         try
         {
@@ -170,7 +170,7 @@ else if (errorMessage != null)
         }
     }
 
-    public async Task HandleKeyDown(KeyboardEventArgs e)
+    private async Task HandleKeyDown(KeyboardEventArgs e)
     {
         if (!recentQueries.Any())
             return;
