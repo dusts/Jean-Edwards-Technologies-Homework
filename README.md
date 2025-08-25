@@ -1,7 +1,7 @@
 # Blazor WebAssembly App (Movie Search App for homework)
 
 ## Overview
-The Blazor WebAssembly App (Movie Search App for homework) is a Blazor WebAssembly application with an ASP.NET Core backend that allows users to search for movies and view detailed information using the OMDB API. The app features a responsive search interface, recent search history with keyboard navigation, and unit tests for both frontend and backend components.
+The Blazor WebAssembly App (Movie Search App for homework) is a Blazor WebAssembly application with an ASP.NET Core backend that allows users to search for movies and view detailed information using the OMDB API. The app features a responsive search interface, recent search history with keyboard navigation, and unit tests for both frontend and backend components.\
 **As a note** - I used Grok AI from x.com as a helper and a bit more advanced googling aparatus. It has its great moments, but there are also a lot of typical dev errors, that takes time to find and fix.
 
 ## Features
